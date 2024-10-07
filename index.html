@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ProHire Portal - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: rgb(10, 90, 82);
+            --secondary-color: #e74c3c;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .login-container {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 2rem;
+            width: 100%;
+            max-width: 400px;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .login-container:hover {
+            transform: translateY(-5px);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: var(--border-color);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .error-message {
+            color: var(--secondary-color);
+            text-align: center;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.875rem;
+        }
+
+        .apply-link {
+            display: block;
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .apply-link:hover {
+            text-decoration: underline;
+        }
+
+        .vacancy-list {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .vacancy {
+            background-color: var(--background-color);
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .vacancy h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .apply-form {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>ProHire Portal</h1>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+        <p id="errorMessage" class="error-message"></p>
+        <a href="#" class="apply-link" id="applyLink">New User? Apply now!</a>
+        <div id="vacancyList" class="vacancy-list"></div>
+        <div id="applyForm" class="apply-form">
+            <h2>Apply for Position</h2>
+            <form id="applicationForm">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="resume">Resume</label>
+                    <textarea id="resume" name="resume" rows="4" required></textarea>
+                </div>
+                <input type="hidden" id="applyingFor" name="applyingFor">
+                <button type="submit">Submit Application</button>
+            </form>
+        </div>
+        <footer class="footer">
+            &copy; 2024 ProHire | All rights reserved.
+        </footer>
+    </div>
+
+    <script>
+        const users = [
+            { username: "hr_admin", password: "hr123", role: "hr" },
+            { username: "john_doe", password: "john123", role: "employee" },
+            { username: "jane_doe", password: "jane123", role: "employee" },
+            { username: "sarah_davis", password: "sarah123", role: "employee" },
+            { username: "chris_lee", password: "chris123", role: "employee" }
+        ];
+
+        const form = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const applyLink = document.getElementById('applyLink');
+        const vacancyList = document.getElementById('vacancyList');
+        const applyForm = document.getElementById('applyForm');
+        const applicationForm = document.getElementById('applicationForm');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const user = users.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                errorMessage.textContent = '';
+                if (user.role === 'employee') {
+                    window.location.href = 'employee.html?username=' + encodeURIComponent(username);
+                } else if (user.role === 'hr') {
+                    window.location.href = 'hradmin.html';
+                }
+            } else {
+                errorMessage.textContent = 'Invalid username or password';
+            }
+        });
+
+        applyLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            const vacancies = JSON.parse(localStorage.getItem('vacancies')) || [];
+            vacancyList.innerHTML = '';
+            if (vacancies.length > 0) {
+                vacancies.forEach(vacancy => {
+                    const vacancyElement = document.createElement('div');
+                    vacancyElement.className = 'vacancy';
+                    vacancyElement.innerHTML = `
+                        <h3>${vacancy.title}</h3>
+                        <p>${vacancy.description}</p>
+                        <button onclick="showApplyForm('${vacancy.title}')">Apply</button>
+                    `;
+                    vacancyList.appendChild(vacancyElement);
+                });
+                vacancyList.style.display = 'block';
+            } else {
+                vacancyList.innerHTML = '<p>No vacancies available at the moment.</p>';
+                vacancyList.style.display = 'block';
+            }
+        });
+
+        function showApplyForm(jobTitle) {
+            applyForm.style.display = 'block';
+            document.getElementById('applyingFor').value = jobTitle;
+        }
+
+        applicationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const fullName = document.getElementById('fullName').value;
+            const email = document.getElementById('email').value;
+            const resume = document.getElementById('resume').value;
+            const applyingFor = document.getElementById('applyingFor').value;
+
+            const application = { fullName, email, resume, applyingFor };
+            const applications = JSON.parse(localStorage.getItem('applications')) || [];
+            applications.push(application);
+            localStorage.setItem('applications', JSON.stringify(applications));
+
+            alert('Application submitted successfully!');
+            applicationForm.reset();
+            applyForm.style.display = 'none';
+        });
+    </script>
+</body>
+</html>

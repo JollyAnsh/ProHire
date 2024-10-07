@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HR Admin Dashboard - ProHire Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: rgb(10, 90, 82);
+            --secondary-color: #e74c3c;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .dashboard-container {
+            background-color: var(--card-background);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            background-color: var(--background-color);
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .tab:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .tab:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .department, .vacancy, .task, .application {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .department:last-child, .vacancy:last-child, .task:last-child, .application:last-child {
+            border-bottom: none;
+        }
+
+        .department h3, .vacancy h3, .task h3, .application h3 {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-remove {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-remove:hover {
+            background-color: #c0392b;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>ProHire Portal - HR Admin Dashboard</h1>
+    </header>
+    <div class="dashboard-container">
+        <div class="tabs">
+            <div class="tab active" data-tab="departments">Departments</div>
+            <div class="tab" data-tab="vacancies">Job Vacancies</div>
+            <div class="tab" data-tab="tasks">Tasks</div>
+            <div class="tab" data-tab="applications">Applications</div>
+        </div>
+
+        <!-- Departments Section -->
+        <section id="departmentsSection">
+            <h2>Departments</h2>
+            <div id="departmentsList"></div>
+        </section>
+
+        <!-- Job Vacancies Section -->
+        <section id="vacanciesSection" style="display: none;">
+            <h2>Job Vacancies</h2>
+            <div id="vacanciesList"></div>
+            <button class="btn" onclick="showAddVacancyForm()">Add New Vacancy</button>
+            <div id="addVacancyForm" style="display: none;">
+                <h3>Add New Vacancy</h3>
+                <form id="vacancyForm">
+                    <div class="form-group">
+                        <label for="jobTitle">Job Title</label>
+                        <input type="text" id="jobTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobDescription">Job Description</label>
+                        <textarea id="jobDescription" required></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Vacancy</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Tasks Section -->
+        <section id="tasksSection" style="display: none;">
+            <h2>Tasks</h2>
+            <div id="tasksList"></div>
+            <button class="btn" onclick="showAddTaskForm()">Add New Task</button>
+            <div id="addTaskForm" style="display: none;">
+                <h3>Add New Task</h3>
+                <form id="taskForm">
+                    <div class="form-group">
+                        <label for="taskTitle">Task Title</label>
+                        <input type="text" id="taskTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="taskDescription">Task Description</label>
+                        <textarea id="taskDescription" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="assignTo">Assign To</label>
+                        <select id="assignTo" required></select>
+                    </div>
+                    <button type="submit" class="btn">Add Task</button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Applications Section -->
+        <section id="applicationsSection" style="display: none;">
+            <h2>Job Applications</h2>
+            <div id="applicationsList"></div>
+        </section>
+
+        <div class="footer">&copy; 2024 ProHire | All rights reserved.</div>
+    </div>
+
+    <script>
+        let departments = [
+            {
+                name: "Engineering",
+                employees: [
+                    { id: 1, name: "John Doe", username: "john_doe" },
+                    { id: 2, name: "Jane Doe", username: "jane_doe" }
+                ]
+            },
+            {
+                name: "Marketing",
+                employees: [
+                    { id: 3, name: "Sarah Davis", username: "sarah_davis" },
+                    { id: 4, name: "Chris Lee", username: "chris_lee" }
+                ]
+            }
+        ];
+
+        let vacancies = JSON.parse(localStorage.getItem('vacancies')) || [];
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let applications = JSON.parse(localStorage.getItem('applications')) || [];
+
+        function renderDepartments() {
+            const departmentsList = document.getElementById('departmentsList');
+            departmentsList.innerHTML = '';
+            departments.forEach(dept => {
+                const deptElement = document.createElement('div');
+                deptElement.className = 'department';
+                deptElement.innerHTML = `
+                    <h3>${dept.name}</h3>
+                    <p>Number of Employees: ${dept.employees.length}</p>
+                    <ul>
+                        ${dept.employees.map(emp => `<li>${emp.name} (${emp.username})</li>`).join('')}
+                    </ul>
+                `;
+                departmentsList.appendChild(deptElement);
+            });
+        }
+
+        function renderVacancies() {
+            const vacanciesList = document.getElementById('vacanciesList');
+            vacanciesList.innerHTML = '';
+            vacancies.forEach((vacancy, index) => {
+                const vacancyElement = document.createElement('div');
+                vacancyElement.className = 'vacancy';
+                vacancyElement.innerHTML = `
+                    <h3>${vacancy.title}</h3>
+                    <p>${vacancy.description}</p>
+                    <button class="btn btn-remove" onclick="removeVacancy(${index})">Remove</button>
+                `;
+                vacanciesList.appendChild(vacancyElement);
+            });
+        }
+
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            tasksList.innerHTML = '';
+            tasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <h3>${task.title}</h3>
+                    <p>${task.description}</p>
+                    <p>Assigned to: ${task.assignedTo}</p>
+                    <p>Status: ${task.completed ? 'Completed' : 'Pending'}</p>
+                    <button class="btn btn-remove" onclick="removeTask(${index})">Remove</button>
+                `;
+                tasksList.appendChild(taskElement);
+            });
+        }
+
+        function renderApplications() {
+            const applicationsList = document.getElementById('applicationsList');
+            applicationsList.innerHTML = '';
+            applications.forEach((application, index) => {
+                const applicationElement = document.createElement('div');
+                applicationElement.className = 'application';
+                applicationElement.innerHTML = `
+                    <h3>${application.fullName}</h3>
+                    <p><strong>Email:</strong> ${application.email}</p>
+                    <p><strong>Applying for:</strong> ${application.applyingFor}</p>
+                    <p><strong>Resume:</strong> ${application.resume}</p>
+                `;
+                applicationsList.appendChild(applicationElement);
+            });
+        }
+
+        function showAddVacancyForm() {
+            document.getElementById('addVacancyForm').style.display = 'block';
+        }
+
+        function showAddTaskForm() {
+            document.getElementById('addTaskForm').style.display = 'block';
+            const assignToSelect = document.getElementById('assignTo');
+            assignToSelect.innerHTML = '';
+            departments.forEach(dept => {
+                dept.employees.forEach(emp => {
+                    const option = document.createElement('option');
+                    option.value = emp.username;
+                    option.textContent = `${emp.name} (${dept.name})`;
+                    assignToSelect.appendChild(option);
+                });
+            });
+        }
+
+        function addVacancy(event) {
+            event.preventDefault();
+            const title = document.getElementById('jobTitle').value;
+            const description = document.getElementById('jobDescription').value;
+            vacancies.push({ title, description });
+            localStorage.setItem('vacancies', JSON.stringify(vacancies));
+            renderVacancies();
+            document.getElementById('vacancyForm').reset();
+            document.getElementById('addVacancyForm').style.display = 'none';
+        }
+
+        function removeVacancy(index) {
+            vacancies.splice(index, 1);
+            localStorage.setItem('vacancies', JSON.stringify(vacancies));
+            renderVacancies();
+        }
+
+        function addTask(event) {
+            event.preventDefault();
+            const title = document.getElementById('taskTitle').value;
+            const description = document.getElementById('taskDescription').value;
+            const assignedTo = document.getElementById('assignTo').value;
+            tasks.push({ title, description, assignedTo, completed: false });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+            document.getElementById('taskForm').reset();
+            document.getElementById('addTaskForm').style.display = 'none';
+        }
+
+        function removeTask(index) {
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function switchTab(tabName) {
+            const sections = ['departmentsSection', 'vacanciesSection', 'tasksSection', 'applicationsSection'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = section === `${tabName}Section` ? 'block' : 'none';
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        document.getElementById('vacancyForm').addEventListener('submit', addVacancy);
+        document.getElementById('taskForm').addEventListener('submit', addTask);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderDepartments();
+            renderVacancies();
+            renderTasks();
+            renderApplications();
+        });
+    </script>
+</body>
+</html>

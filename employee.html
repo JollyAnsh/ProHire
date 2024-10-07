@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard - ProHire Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: rgb(10, 90, 82);
+            --secondary-color: #e74c3c;
+            --background-color: #f4f7f9;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --transition-speed: 0.3s;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+        }
+
+        .header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .dashboard-container {
+            background-color: var(--card-background);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px var(--shadow-color);
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 2rem;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 0.75rem;
+            background-color: var(--background-color);
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .tab:first-child {
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+        }
+
+        .tab:last-child {
+            border-top-right-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .task {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .task:last-child {
+            border-bottom: none;
+        }
+
+        .task h3 {
+            color: var(--primary-color);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color var(--transition-speed) ease;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #888;
+            font-size: 0.875rem;
+        }
+
+        .attendance {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .attendance-status {
+            font-weight: bold;
+        }
+
+        .present {
+            color: green;
+        }
+
+        .absent {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>ProHire Portal - Employee Dashboard</h1>
+    </header>
+    <div class="dashboard-container">
+        <div class="tabs">
+            <div class="tab active" data-tab="attendance">Attendance</div>
+            <div class="tab" data-tab="tasks">Tasks</div>
+        </div>
+
+        <!-- Attendance Section -->
+        <section id="attendanceSection">
+            <h2>Attendance</h2>
+            <div class="attendance">
+                <p>Today's Date: <span id="currentDate"></span></p>
+                <p>Status: <span id="attendanceStatus" class="attendance-status"></span></p>
+                <button id="markAttendanceBtn" class="btn">Mark Attendance</button>
+            </div>
+        </section>
+
+        <!-- Tasks Section -->
+        <section id="tasksSection" style="display: none;">
+            <h2>Assigned Tasks</h2>
+            <div id="tasksList"></div>
+        </section>
+
+        <div class="footer">&copy; 2024 ProHire | All rights reserved.</div>
+    </div>
+
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+        let currentEmployee = '';
+
+        function renderTasks() {
+            const tasksList = document.getElementById('tasksList');
+            tasksList.innerHTML = '';
+            const employeeTasks = tasks.filter(task => task.assignedTo === currentEmployee);
+            employeeTasks.forEach((task, index) => {
+                const taskElement = document.createElement('div');
+                taskElement.className = 'task';
+                taskElement.innerHTML = `
+                    <h3>${task.title}</h3>
+                    <p>${task.description}</p>
+                    <label>
+                        <input type="checkbox" ${task.completed ? 'checked' : ''} onchange="updateTaskStatus(${index})">
+                        ${task.completed ? 'Completed' : 'Mark as Complete'}
+                    </label>
+                `;
+                tasksList.appendChild(taskElement);
+            });
+        }
+
+        function updateTaskStatus(index) {
+            const employeeTasks = tasks.filter(task => task.assignedTo === currentEmployee);
+            const taskIndex = tasks.findIndex(task => task === employeeTasks[index]);
+            tasks[taskIndex].completed = !tasks[taskIndex].completed;
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        }
+
+        function switchTab(tabName) {
+            const sections = ['attendanceSection', 'tasksSection'];
+            sections.forEach(section => {
+                document.getElementById(section).style.display = section === `${tabName}Section` ? 'block' : 'none';
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.tab === tabName);
+            });
+        }
+
+        function markAttendance() {
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem(`attendance_${currentEmployee}_${today}`, 'present');
+            updateAttendanceStatus();
+        }
+
+        function updateAttendanceStatus() {
+            const today = new Date().toISOString().split('T')[0];
+            const status = localStorage.getItem(`attendance_${currentEmployee}_${today}`);
+            const statusElement = document.getElementById('attendanceStatus');
+            if (status === 'present') {
+                statusElement.textContent = 'Present';
+                statusElement.className = 'attendance-status present';
+                document.getElementById('markAttendanceBtn').style.display = 'none';
+            } else {
+                statusElement.textContent = 'Not Marked';
+                statusElement.className = 'attendance-status absent';
+                document.getElementById('markAttendanceBtn').style.display = 'inline-block';
+            }
+        }
+
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        document.getElementById('markAttendanceBtn').addEventListener('click', markAttendance);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            currentEmployee = urlParams.get('username');
+            document.querySelector('.header h1').textContent += ` - ${currentEmployee}`;
+
+            const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('currentDate').textContent = currentDate;
+            updateAttendanceStatus();
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
